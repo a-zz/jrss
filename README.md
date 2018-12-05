@@ -12,13 +12,13 @@ JRSS production API implements four basic operations:
 
 * **psh(stackid, data)**: _pushes_ new data into the stack referred by _stackid_. This id can be any string up to 1024 characters, but some sort of "package-like" scheme is advisable. The stack is created if it doesn't previously exist, and the data chunk is stored along with a timestamp.
 
-* **pop(stackid)**: _pops_ last data from the stack referred by _stackid_, removing it from the stack. Regardless the actual data stored, the return value is always a JSON object; it is be discused below.
+* **pop(stackid)**: _pops_ last data from the stack referred by _stackid_, removing it from the stack. Regardless the actual data stored, the return value is always a JSON object; it is discused below.
 
 * **get(stackid)**: serves the same purpose as _pop_, but data isn't removed from the stack.
 
 * **rst(stackid)**: _resets_ the stack referred by _stackid_; i.e. destroy it.
 
-These API calls are invoked as simple web URLs, e.g. http://your.server/jrss/push . Arguments (stackid and data) can be placed in the GET query string or submitted as POST form fields (the later being the preferred method for several reasons). As a result, the client can be anything that can request data from the web: JavaScript (AJAX), Java, Python, Perl, wget, curl... you name it.
+These API calls are invoked as simple web URLs, e.g. http://your.server/jrss/psh . Arguments (stackid and data) can be placed in the GET query string or submitted as POST form fields (the later being the preferred method for several reasons). As a result, the client can be anything that can request data from the web: JavaScript (AJAX), Java, Python, Perl, wget, curl... you name it.
 
 The return value from JRSS basic operations is always a JSON object with three values:
 
