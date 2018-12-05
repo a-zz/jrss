@@ -5,14 +5,14 @@ JSON Raw Storage Stack
 
 JRSS is an online repository for JSON data, enabling distributed applications to exchange information via HTTP in an extremely quick & dirty fashion.
 
-JRSS simply stores text data chunks (foreseeably in JSON format, although this is not checked nor enforced) referred by an id. Storage is run in a stacked fashion: older values for a certain id are kept unless explicitly removed, so JRSS may be used for instant values as well as log storage.
+JRSS simply stores text data chunks (foreseeably in JSON format, although this is not checked nor enforced) referred by an id. Storage is run in a stacked fashion: older values for a certain id are kept unless explicitly removed, so JRSS may be used for instant or historic values, log storage and -well- a proper stack functionality.
 
 ## API overview ##
 JRSS production API implements four basic operations: 
 
 * **psh(stackid, data)**: _pushes_ new data into the stack referred by _stackid_. This id can be any string up to 1024 characters, but some sort of "package-like" scheme is advisable. The stack is created if it doesn't previously exist, and the data chunk is stored along with a timestamp.
 
-* **pop(stackid)**: _pops_ last data from the stack referred by _stackid_, removing it from the stack. Regardless the actual data stored, the return value is always a JSON object; it'll be discused later.
+* **pop(stackid)**: _pops_ last data from the stack referred by _stackid_, removing it from the stack. Regardless the actual data stored, the return value is always a JSON object; it is be discused below.
 
 * **get(stackid)**: serves the same purpose as _pop_, but data isn't removed from the stack.
 
@@ -26,7 +26,7 @@ The return value from JRSS basic operations is always a JSON object with three v
 * **"timestamp"**: the operation current date and time as a long integer (epoch). It's always the timestamp attached to the stored data, except for the rst operation.
 * **"data"**: when status=="OK", its value is the stored data (except for the psh and rst operations, which would make no sense); if in "ER", its value is a two digit error code followed by a human readable description.
 
-Foreseeably some advanced operations (e.g. stack rotation, reversion, dumping) will be needed, as well as a metadata query API. These aren't considered and this early phase of the project.
+Foreseeably some advanced operations (e.g. stack rotation, reversion, dumping) will be needed, as well as a metadata query API. These aren't considered at this early phase of the project.
 
 ## Security ##
 The security scheme for JRSS is called _No Object Needs Encryption_. That is: NONE.
