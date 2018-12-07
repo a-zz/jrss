@@ -1,12 +1,10 @@
 --------------------------------------------------------------------------------
-  skel-app
+  jrss
 
-  Basic layout and features for a J2EE application for personal projects
+  JSON Raw Storage Stack
 
   github.com/a-zz, 2018
 --------------------------------------------------------------------------------
-
-[Template INSTALL file, customize accordingly]
 
 ..:: INITIAL SETUP ::..
 Before the first build we should take a few minutes setting up our local
@@ -33,7 +31,7 @@ we should only need to enter the application directory and run:
 
 If everything runs fine, we should have a j2ee-deployable directory in
 
-  deployable/skel-app/
+  deployable/jrss/
   
 CUSTOMIZING OUR INSTALLATION: THE BUILDING PROCCESS EXPLAINED
 
@@ -43,7 +41,7 @@ Basically, the application layout is:
     web/		   - Non-compilable code (web files)
   lib/			 - Libraries (mostly JARs) needed for compilation
   deployable/	 - This is where the deployable product is dropped, i.e.:
-    skel-app/    - The j2ee-deployable application directory  
+    jrss/    - The j2ee-deployable application directory  
   config/		 - Persistent configuration directory, see below
   
 The building process goes as this:
@@ -51,16 +49,16 @@ The building process goes as this:
 1. init - Set the build timestamp and the deployable target directory
 
 2. layout - Set the application layout. This basically means copying the
-	source/web directory as deployable/skel-app/
+	source/web directory as deployable/jrss/
 	
-3. compile - Compile Java files to deployable/skel-app/WEB-INF/classes. JARs
+3. compile - Compile Java files to deployable/jrss/WEB-INF/classes. JARs
 	needed for this are found in the lib/ directory.
 	
 4. configure - Apply persistent configurations to the deployable application.
 	Again, see below.
 	
 5. deployable - Final touches to the deployable application. Basically, copying 
-	the JARs from lib/ to deployable/skel-app/WEB-INF/lib, and anything 
+	the JARs from lib/ to deployable/jrss/WEB-INF/lib, and anything 
 	else that should be neccesary.
 	
 Ok, it's time for the configuration step.
@@ -75,11 +73,11 @@ i. Place our configuration files under config/web/. That directory isn't
 modify them.
 
 2. The configuration step in the building process just copies / overwrites those
-files from config/web/ to deployable/skel-app/, keeping their subdirectory 
+files from config/web/ to deployable/jrss/, keeping their subdirectory 
 locations, i.e.:
 
 	config/						deployable/
-		web/						skel-app/
+		web/						jrss/
 			anySubDir/					anySubDir/
 				a_file_here --------------> a_file_here
 				
@@ -103,13 +101,13 @@ local configurations affecting the build process. Currently none.
 
 ..:: DEPLOYMENT ::..
 As said, when the build process is finished we have a j2ee-deployable 
-directory in deployable/skel-app/. So, in order to deploy it we can:
+directory in deployable/jrss/. So, in order to deploy it we can:
 
 i. copy it to the servlet container deployment directory (e.g. 
 $TOMCAT_HOME/webapps/); or
 
 ii. if you're building on the target server, you can just place a symbolic link
-under the servlet container deployment directory to deployable/skel-app/. This 
+under the servlet container deployment directory to deployable/jrss/. This 
 works like a charm on Linux, (and Mac Os X, supposedly) and it's our favourite 
 approach; can't tell if it's feasible on Windows.
 
@@ -134,11 +132,11 @@ Anyway, a few things worth saying:
 
 i. An Ant build should be made before configuring the project Build Path in 
 order to populate de deployable directory. Build Path output folder should be
-deployable/skel-app/WEB-INF/classes/, so changes to Java files are hot-replaced
+deployable/jrss/WEB-INF/classes/, so changes to Java files are hot-replaced
 into the debugging application.
 
 ii. Non-compilable web files are copied at build time from source/web/ to
-deployable/skel-app/. Changes in the later directory are hot-replaced into the
+deployable/jrss/. Changes in the later directory are hot-replaced into the
 debugging application, but are **not** tracked by GIT. Those changes must be
 applied to source/web/ prior to committing. Eclipse compare tool works fine for
 that. It's advisable to apply changes often in order to avoid local changes 
