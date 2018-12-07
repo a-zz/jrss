@@ -1,10 +1,10 @@
-<project name="skel-app" default="deployable" basedir=".">
+<project name="jrss" default="deployable" basedir=".">
 	<description>
-    	Basic application layout for personal projects
+    	jrss - JSON RAW Storage Stack
   	</description>
 	
 	<!-- Global properties -->
-	<property name="deploy.name" value="skel-app"/>
+	<property name="deploy.name" value="jrss"/>
 	<property name="src.web" location="source/web" />
 	<property name="src.java" location="source/java" />
 	<property name="lib" location="lib"/>

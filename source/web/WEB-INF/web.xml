@@ -7,9 +7,9 @@
 <web-app>
 
 	<!-- General description -->
-	<display-name>skel-app</display-name>
+	<display-name>jrss</display-name>
 	<description>
-		Basic application layout for personal projects
+		JSON Raw Storage Stack
 	</description>
 
 	<!-- Context parameters -->
