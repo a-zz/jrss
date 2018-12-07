@@ -1,0 +1,34 @@
+--------------------------------------------------------------------------------
+  skel-app
+
+  Basic layout and features for a J2EE application for personal projects
+
+  github.com/a-zz, 2018
+--------------------------------------------------------------------------------
+
+..:: FEATURES so far ::..
+
+* Designed for quick & dirty (while coherent) deployments.
+
+* Embedded HSQLDB database with connection tracking, transaction support and 
+    autoversioning. Data access is in fact abstracted, so support for other 
+    database engines can (hopefully) be easily implemented.
+    
+* App configuration properties support (database-stored)
+
+* Flexible building process for continuous integration workflows. Builtin
+    local configuration support for target machine.
+
+* Enterprise-grade utility classes
+
+* App logging via log4j2.
+
+* GWT 2.8.2 UI support (as an option; to be found in branch gwt). 
+	Please consider that builtin UI support is the very basic; in order to get 
+	full advantage of GWT, a full SDK should be downloaded 
+	(from http://www.gwtproject.org/download.html) and the required JARs added 
+	to the project.
+
+* Tested for servlet container: Apache Tomcat 8.5
+
+--------------------------------------------------------------------------------

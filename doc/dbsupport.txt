@@ -1,0 +1,120 @@
+--------------------------------------------------------------------------------
+  skel-app
+
+  Adding support for database engines
+
+  github.com/a-zz, 2018
+--------------------------------------------------------------------------------
+
+..:: Introduction ::..
+skel-app is intended as a quick & dirty (while coherent) deployable application;
+therefore, HSQLDB is the preferred database engine, as it needs no DBA 
+intervention outside the app: the database is just created on the fly at first 
+boot; from there on, the DbUpdater class takes care of bringing the database 
+version up to the application version deployed.
+
+Anyway, abstract database support is added for flexibiliy, so support for any 
+database can (hopefully) be easily added.
+
+..:: Abstract data access model ::..
+(Unless otherwise stated, classes referred in this section are found within the
+io.github.azz.sql package.)
+
+In order to provide database engine abstraction, data access classes are
+implemented from two interfaces:
+  	
+  * mypackage.da.MyClassDaInterface: data access interface for a certain 
+  	consumer class. Defines required access data methods for the class. This
+  	in turn extends the general super-interface DaInterface.
+  
+  * .rdbms.DATABASE_ENGINEInterface: interface for a certain database engine. 
+  	This is only useful so far for marking classes related to the engine. 
+  	Engines currently supported are listed in the 
+  	RdbmsSupport.enumDatabaseEngines member. If a class is valid for a number of
+  	engines (i.e. the SQL used is fully compatible between them) it may
+  	implement all the related engine interfaces.
+
+The actual data access implementation should be placed under 
+mypackage.da.MyClassDATABASE_ENGINE (e.g. .mypackage.da.MyClassHSQLDB). In fact,
+it's not necessary to append DATABASE_ENGINE to the class name, as 
+engine-related classes are marked via the DATABASE_ENGINE interface; it's 
+advisable, though.
+
+Summarizing:
+
+	mypackage. 					--> A package
+		MyClass 				--> A data access consumer class
+		da.     				--> Data access sub-package
+			MyClassDaInterface	--> Data acces interface for the class
+			MyClassHSQLDB		--> HSQLDB data access implementation
+			MyClassOTHER_ENGINE --> Other RDBMS engine implementation
+
+Engine currently running is got from the DbManager.getDatabaseEngine() method. 
+DbManager takes care of determining the selected engine (from the db.url local 
+property) and loading the driver class by calling RdbmsSupport.registerDriver().
+
+The utility function DaInterface.getImplClassFor() helps finding the data access 
+implementation class for a certain consumer class and database engine.
+
+Every SQL instruction in the data access implementing classes should be 
+pipelined through the utility class SqlTransaction, that keeps track of opened 
+transactions, related objects and data connections currently in use.
+
+..:: Implementing data access classes ::..
+Figure out we're implementing a new mypackage.MyClass data access consumer 
+class. We need to provide:
+
+  * mypackage.da.MyClassDaInterface. Data access interface for MyClass
+  	extending DaInterface; must define those methods required in implementation
+  	classes. It must be emphasized that the interface name for "MyClass"
+  	must be literally named "MyClassDaInterface", as some other interfaces for
+  	some other consumer classes may be placed in the .da package.  
+  	
+  * A mypackage.da.MyCassDATABASE_ENGINE class implementing MyClassDaInterface
+  	for every one of the database engines defined in 
+  	RdbmsSupport.enumDatabaseEngines.
+  	
+  * Initialization code in mypackage.MyClass. This is needed to locate the
+  	proper implementation class, by means of the DaInterface.getImplClassFor()
+  	utility method. E.g.
+  	
+  	private final static MyClassDaInterface dao = init();
+	private static MyClassDaInterface init() {	
+		try {
+			logger = new AppLogger(MyClass.class);
+			return (MyClassDaInterface)DaInterface.
+				getImplClassFor(MyClass.class).newInstance();
+		}
+		catch(Exception e) {
+			logger.error("Unable to instantiate data access implementation " +
+				class for " + MyClass.class);
+			return null;
+		}
+	}
+  	
+..:: Adding support for other engines ::..
+We should start by adding the engine to RdbmsSupport; particularly:
+
+  * Adding a nemonic for the engine in enumDatabaseEngines
+  * Database URL parsing and driver class load in registerDriver()
+  
+From there on, the method RdbmsSupport.check() can find which data access
+consumer classes require an implementation for the new engine. 
+  	
+..:: Coding-style guidelines ::.. 
+In implementing data access classes and interfaces, the following guidelines
+should be applied:
+
+  * Don't log at data access implementation classes; automatic logging by 
+  	SqlTransaction class should be enough at that level.
+  	
+  * Data access implementation classes' methods MUST catch SqlException in
+  	order to close the transaction in the finally{} block, and then re-throw
+  	the exception.
+  	
+  * Data acces consumer classes' methods (i.e. .mypackage.MyClass) SHOULDN'T
+  	catch any exception emerging from implementation classes.
+  	
+As usual, the best approach to meeting this guidelines is copying code from 
+an already-working data access consuming class.  	  	 
+--------------------------------------------------------------------------------

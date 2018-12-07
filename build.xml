@@ -1,0 +1,106 @@
+<project name="skel-app" default="deployable" basedir=".">
+	<description>
+    	Basic application layout for personal projects
+  	</description>
+	
+	<!-- Global properties -->
+	<property name="deploy.name" value="skel-app"/>
+	<property name="src.web" location="source/web" />
+	<property name="src.java" location="source/java" />
+	<property name="lib" location="lib"/>
+	<property name="config" location="config"/>
+	<property name="deployable" location="deployable/${deploy.name}"/>
+	
+	<!-- Build tasks -->
+	<target name="init" description="Initialize...">
+		<tstamp/>
+		<mkdir dir="${deployable}"/>
+	</target>
+
+	<target name="layout" depends="init" description="Set the basic layout">
+		<copy todir="${deployable}" overwrite="true" verbose="true">  
+		    <fileset dir="${src.web}"/>  
+		</copy>
+	</target>
+	
+	<target name="compile" depends="layout" description="Compile sources">
+		<mkdir dir="${deployable}/WEB-INF/classes"/>
+		<javac srcdir="${src.java}" destdir="${deployable}/WEB-INF/classes" 
+			includeantruntime="false">
+			<classpath>
+				<pathelement location="${lib}/commons-lang3-3.7.jar"/>
+				<pathelement location="${lib}/hsqldb-2.4.0.jar"/>
+				<pathelement location="${lib}/javax.servlet-api-3.1.0.jar"/>
+				<pathelement location="${lib}/log4j-api-2.10.0.jar"/>
+				<pathelement location="${lib}/log4j-core-2.10.0.jar"/>
+			</classpath>
+		</javac>
+	</target>
+		
+	<target name="configure" depends="compile" 
+		description="Applies persistent configuration">
+		<fail message="Local configuration needed. At least
+config/web/WEB-INF/local.properties should be provided; copy it from
+source/web/WEB-INF/local.properties and customize it for target server. Consider
+doing the same for other files under source/web/WEB-INF/">		
+			<condition>
+				<not>
+					<available file="${config}/web/WEB-INF/local.properties"/>			
+				</not>
+			</condition>
+		</fail>
+		<java classname="io.github.azz.config.LocalConfiguration" 
+			classpath="${deployable}/WEB-INF/classes"
+			outputproperty="missing.properties">
+			<arg value="${config}/web/WEB-INF/local.properties"/> 
+			<arg value="${src.web}/WEB-INF/local.properties"/>
+		</java>
+		<fail message="Local configuration out of date. The following keys are
+missing from config/web/WEB-INF/local.properties: ${missing.properties}. Please
+fix and rebuild. Take source/web/WEB-INF/local.properties as a reference.">
+			<condition>
+				<not>
+					<equals arg1="${missing.properties}" arg2=""/>
+				</not>
+			</condition>
+		</fail>
+		<java classname="io.github.azz.config.LocalConfiguration" 
+			classpath="${deployable}/WEB-INF/classes"
+			outputproperty="unnecessary.properties">
+			<arg value="${src.web}/WEB-INF/local.properties"/>
+			<arg value="${config}/web/WEB-INF/local.properties"/> 			
+		</java>
+		<condition property="warn.unnecesary.properties">
+			<not>
+				<equals arg1="${unnecessary.properties}" arg2=""/>
+			</not>			
+		</condition>			
+		<copy todir="${deployable}" overwrite="true" verbose="true">
+			<fileset dir="${config}/web" excludes="CONTENTS" />
+		</copy>	
+	</target>
+	
+	<target name="postconfigure" depends="configure" 
+	if="warn.unnecesary.properties">
+		<echo message="Local configuration posibly out of date. The following
+keys aren't neccesary in config/web/WEB-INF/local.properties:
+${unnecessary.properties}"/>
+	</target>	
+	
+	<target name="deployable" depends="postconfigure" 
+		description="Generate the deployable application">
+		<mkdir dir="${deployable}/WEB-INF/lib"/>
+		<copy todir="${deployable}/WEB-INF/lib" >  
+		    <fileset dir="${lib}" includes="*.jar"/>  
+		</copy>
+	</target>
+
+	<target name="clean" description="Clean up previous builds">
+		<delete dir="${deployable}" />
+	</target>
+	
+	<target name="war" depends="deployable" 
+		description="Create a deployable WAR package">
+		<war basedir="${deployable}" destfile="deployable/${deploy.name}.war"/>
+	</target>
+</project>
