@@ -58,9 +58,6 @@ public class DbUpdaterHSQLDB implements DbUpdaterDaInterface, HSQLDBInterface {
 					"READ timestamp)");
 			saveVersionInfo(0, "Database (and version tracking) initialization", t);
 		}
-		catch(SQLException e) {
-			throw e;
-		}
 		finally {
 			t.close();
 		}
@@ -76,26 +73,17 @@ public class DbUpdaterHSQLDB implements DbUpdaterDaInterface, HSQLDBInterface {
 					"(ID integer identity primary key, " +
 					"STACKID varchar(1024) not null)");
 			t.statement("create unique index IDX_STACK on STACKS (STACKID)");
-			t.statement("create table STACK_VALUES " +
+			t.statement("create table STACK_DATA " +
 					"(ID integer identity primary key, " +
 					"STACK_ID integer, " +
 					"TS timestamp default current_timestamp not null, " +
 					"DATA clob)");
-			t.statement("alter table STACK_VALUES add foreign key (STACK_ID) references STACKS (ID)");
+			t.statement("alter table STACK_DATA add foreign key (STACK_ID) references STACKS (ID)");
 			saveVersionInfo(1, "Data model for jrss", t);
-		}
-		catch(SQLException e) {
-			throw e;
 		}
 		finally {
 			t.close();
 		}
-		/*
-		 * ;
-;
-;
-;
-		 */
 	}
 	
 	public void saveVersionInfo(int version, String description, SqlTransaction t) throws SQLException {

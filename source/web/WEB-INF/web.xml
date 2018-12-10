@@ -28,10 +28,16 @@
 	</welcome-file-list>
 
 	<!-- Servlet definitions -->
-	<!-- (nothing yet) -->
+	<servlet>
+		<servlet-name>JrssStackOperation</servlet-name>
+		<servlet-class>io.github.azz.jrss.JrssServlet</servlet-class>
+	</servlet>
 
 	<!-- Define mappings -->
-	<!-- (nothing yet) -->
+	<servlet-mapping>
+		<servlet-name>JrssStackOperation</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
 	<!-- Session config -->
 	<session-config>
