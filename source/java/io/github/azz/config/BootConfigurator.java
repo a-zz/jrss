@@ -39,14 +39,14 @@ public class BootConfigurator  implements ServletContextListener {
 		AppLogger logger;
 		try {
 			String greeting = "\n" +
-					"                  _  _       _\n" +
-					"            ___ (~ )( ~)    |_|\n" +
-					"           /   \\_\\ \\/ /      _ _ __________\n" +
-					"          |   D_ ]\\ \\/      | | '_/  _/  _/\n" +
-					"          |   D _]/\\ \\      | | | \\ _ \\ _ \\\n" +
-					"           \\___/ / /\\ \\     | |_| /___/___/ is starting...\n" +
-					"                (_ )( _)   /_/\n" +
-					"                  ~  ~                                                 ";
+					"             _  _                                                _\n" +
+					"       ___ (~ )( ~)      _        _                             |_|\n" +
+					"      /   \\_\\ \\/ /   ___| | _ ___| |     ___ ___ ___   __  __    _ _ __________\n" +
+					"     |   D_ ]\\ \\/   /  _| |/ / _ \\ | ___ \\_ \\ _ \\ _ \\  \\ \\ \\ \\  | | '_/  _/  _/\n" +
+					"     |   D _]/\\ \\   \\ _ \\   \\  __/ |/__// _ |  _/  _/  / / / /  | | | \\ _ \\ _ \\\n" +
+					"      \\___/ / /\\ \\  /___/_|\\_\\___|_|    \\___| | | |   /_/ /_/   | |_| /___/___/\n" +
+					"           (_ )( _)                         |_| |_|            /_/\n" +
+					"             ~  ~                                                 is starting...\n";
 			AppLogManager.initialize(sce.getServletContext().getRealPath(log4j2ConfigPath), greeting);
 			logger = new AppLogger(BootConfigurator.class);
 		}
