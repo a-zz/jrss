@@ -50,12 +50,13 @@ public class Stack {
 	
 	/**
 	 * Pushes data into the stack. The stack is created if it doesn't exist.
-	 * @param data (String) The data to push
+	 * @param data (String) The data to push. If null, an empty string is pushed.
 	 * @return (String) The operation timestamp. 
 	 * @throws StackException
 	 */
 	public String psh(String data) throws StackException {
 		
+		data = data!=null?data:"";
 		logger.debug("Pushing " + data.getBytes().length + " bytes of data into stack " + stackid);
 		return dao.psh(stackid, data, true);
 	}

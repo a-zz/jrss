@@ -96,9 +96,10 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 			currentOperationErrorCode = EnumErrorCodes.E31;
 			long id = -1;
 			String[] result = new String[2];
-			sql = "select	D.ID, unix_millis(D.TS) as TS, D.DATA " + 
-					"from	STACKS S left join STACK_DATA D on S.ID=D.STACK_ID " + 
-					"where	S.STACKID='" + stackid + "'";
+			sql = "select		D.ID, unix_millis(D.TS) as TS, D.DATA " + 
+					"from		STACKS S left join STACK_DATA D on S.ID=D.STACK_ID " + 
+					"where		S.STACKID='" + stackid + "' " +
+					"order by 	D.TS desc";
 			ResultSet rs = t.query(sql);
 			if(!rs.next())
 				throw new StackException(EnumErrorCodes.E11);

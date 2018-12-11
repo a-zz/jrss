@@ -7,6 +7,7 @@ package io.github.azz.jrss;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -24,8 +25,6 @@ import io.github.azz.logging.AppLogger;
  * Stack operation servlet
  * @author a-zz
  * TODO Production-grade testing needed
- * TODO Localization tests needed
- * TODO POST method to be implemented 
  */
 public class JrssServlet extends HttpServlet {
 
@@ -68,7 +67,7 @@ public class JrssServlet extends HttpServlet {
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E01, "ER01 - Unsupported operation");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E09, "ER09 - Unknown error");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E10, "ER10 - Bad stackid");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E11, "ER11 - Stack doesn't exist");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E11, "ER11 - Stack does not exist");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E12, "ER12 - Stack is empty");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E30, "ER30 - DB is unavailable");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E31, "ER31 - DB read error");
@@ -81,10 +80,23 @@ public class JrssServlet extends HttpServlet {
 		logger.debug("jrss servlet initialized");
 	}
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
 
 		logger.info("Servlet received GET call");
-		
+		doGetOrPost(request, response);
+	}
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+	    
+		logger.info("Servlet received POST call");
+		doGetOrPost(request, response);
+	}
+
+	private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+
 		PrintWriter out = response.getWriter();
 		response.setContentType("application/json");
 		JrssResponse jrssResponse = null;
@@ -96,26 +108,23 @@ public class JrssServlet extends HttpServlet {
 			jrssResponse = new JrssResponse(EnumOperationStatus.ERROR, 
 					null, null, StackException.EnumErrorCodes.E01);
 		}
-		else {
-			String stackid = request.getParameter("stackid");
+		else {			
+			String stackid = URLEncoder.encode(request.getParameter("stackid"), "UTF-8");
 			String data = request.getParameter("data");
+			if(data!=null)
+				data = URLEncoder.encode(data, "UTF-8");
 			jrssResponse = stackOperation(op, stackid, data);
 		}
 		
 		out.print(jrssResponse.toJson());
 	}
-
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    
-		// TODO To be implemented!
-	}
-
+	
 	private JrssResponse stackOperation(EnumOperations operation, String stackid, String data) {
 		
 		try {
 			Stack stack = new Stack(stackid);
 			String opRespScalar;
-			String[] opRespVector;
+			String[] opRespVector;	
 			
 			switch(operation) {
 			case PSH:
