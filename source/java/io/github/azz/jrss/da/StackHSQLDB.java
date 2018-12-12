@@ -30,12 +30,12 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 		
 		try {
 			// 1. Setups the transaction
-			currentOperationErrorCode = EnumErrorCodes.E30;
+			currentOperationErrorCode = EnumErrorCodes.E31;
 			t = new SqlTransaction("Stack push", false);
 			
 			// 2. Check whether the stack exists
 			long id = -1;
-			currentOperationErrorCode = EnumErrorCodes.E31;
+			currentOperationErrorCode = EnumErrorCodes.E32;
 			sql = "select id from STACKS where STACKID='" + stackid + "'";
 			ResultSet rs1 = t.query(sql);
 			if(rs1.next())
@@ -43,10 +43,10 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 			
 			// 2.1. Create stack if needed to
 			if(id==-1) {
-				currentOperationErrorCode = EnumErrorCodes.E32;
+				currentOperationErrorCode = EnumErrorCodes.E33;
 				sql = "insert into STACKS (STACKID) values ('" + stackid + "')";
 				t.statement(sql);
-				currentOperationErrorCode = EnumErrorCodes.E31;
+				currentOperationErrorCode = EnumErrorCodes.E32;
 				sql = "select id from STACKS where STACKID='" + stackid + "'";
 				ResultSet rs2 = t.query(sql);
 				rs2.next();
@@ -54,14 +54,14 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 			}
 
 			// 3. Insert data into the stack
-			currentOperationErrorCode = EnumErrorCodes.E32;
+			currentOperationErrorCode = EnumErrorCodes.E33;
 			sql = "insert into STACK_DATA (STACK_ID, DATA) values (" + id + ", ?)";
 			ArrayList<Object> values = new ArrayList<>();
 			values.add(data);
 			t.preparedStatement(sql, values);
 
 			// 4. Get the data timestamp
-			currentOperationErrorCode = EnumErrorCodes.E31;
+			currentOperationErrorCode = EnumErrorCodes.E32;
 			sql = "select unix_millis(TS) as TS from STACK_DATA where STACK_ID=" + id + " order by ID desc";
 			ResultSet rs3 = t.query(sql);
 			rs3.next();
@@ -89,11 +89,11 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 		
 		try {
 			// 1. Setups the transaction
-			currentOperationErrorCode = EnumErrorCodes.E30;
+			currentOperationErrorCode = EnumErrorCodes.E31;
 			t = new SqlTransaction("Stack pop/get", true);
 			
 			// 2. Get data from the stack
-			currentOperationErrorCode = EnumErrorCodes.E31;
+			currentOperationErrorCode = EnumErrorCodes.E32;
 			long id = -1;
 			String[] result = new String[2];
 			sql = "select		D.ID, unix_millis(D.TS) as TS, D.DATA " + 
@@ -102,11 +102,11 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 					"order by 	D.TS desc";
 			ResultSet rs = t.query(sql);
 			if(!rs.next())
-				throw new StackException(EnumErrorCodes.E11);
+				throw new StackException(EnumErrorCodes.E12);
 			else {
 				String data = rs.getString("DATA");
 				if(data==null)
-					throw new StackException(EnumErrorCodes.E12);
+					throw new StackException(EnumErrorCodes.E13);
 				else {
 					id = rs.getLong("ID");
 					result[0] = Long.toString(rs.getLong("TS"));
@@ -116,7 +116,7 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 			
 			// 3. Delete the last value, if instructed
 			if(delete) {
-				currentOperationErrorCode = EnumErrorCodes.E32;
+				currentOperationErrorCode = EnumErrorCodes.E33;
 				sql = "delete from STACK_DATA where ID=" + id;
 				t.statement(sql);
 			}
@@ -142,13 +142,13 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 		
 		try {
 			// 1. Setups the transaction
-			currentOperationErrorCode = EnumErrorCodes.E30;
+			currentOperationErrorCode = EnumErrorCodes.E31;
 			t = new SqlTransaction("Stack reset", false);
 			
 			// 2. Check whether the stack exists
 			long id = -1;
 			long timestamp = -1;
-			currentOperationErrorCode = EnumErrorCodes.E31;
+			currentOperationErrorCode = EnumErrorCodes.E32;
 			sql = "select unix_millis(current_timestamp) as TS, id from STACKS where STACKID='" + stackid + "'";
 			ResultSet rs1 = t.query(sql);
 			if(rs1.next()) {
@@ -156,10 +156,10 @@ public class StackHSQLDB  implements StackDaInterface, HSQLDBInterface {
 				timestamp = rs1.getLong("TS");
 			}
 			else
-				throw new StackException(EnumErrorCodes.E11);
+				throw new StackException(EnumErrorCodes.E12);
 			
 			// 3. Destroys stack data and the stack itself
-			currentOperationErrorCode = EnumErrorCodes.E32;
+			currentOperationErrorCode = EnumErrorCodes.E33;
 			sql = "delete from STACK_DATA where STACK_ID=" + id;
 			t.statement(sql);
 			sql = "delete from STACKS where ID=" + id;

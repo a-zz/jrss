@@ -43,7 +43,7 @@ public class Stack {
 		if(stackid==null ||
 				stackid.length()==0 ||
 				stackid.length()>2014)
-			throw new StackException(EnumErrorCodes.E10);
+			throw new StackException(EnumErrorCodes.E11);
 		
 		this.stackid = stackid;
 	}

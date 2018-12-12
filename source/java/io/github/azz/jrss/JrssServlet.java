@@ -66,12 +66,12 @@ public class JrssServlet extends HttpServlet {
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E00, "ER00 - No error");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E01, "ER01 - Unsupported operation");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E09, "ER09 - Unknown error");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E10, "ER10 - Bad stackid");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E11, "ER11 - Stack does not exist");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E12, "ER12 - Stack is empty");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E30, "ER30 - DB is unavailable");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E31, "ER31 - DB read error");
-		jsonErrorMessages.put(StackException.EnumErrorCodes.E32, "ER32 - DB write error");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E11, "ER11 - Bad stackid");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E12, "ER12 - Stack does not exist");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E13, "ER13 - Stack is empty");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E31, "ER31 - DB is unavailable");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E32, "ER32 - DB read error");
+		jsonErrorMessages.put(StackException.EnumErrorCodes.E33, "ER33 - DB write error");
 		jsonErrorMessages.put(StackException.EnumErrorCodes.E39, "ER39 - Unknown DB error");
 	}
 	
@@ -80,43 +80,47 @@ public class JrssServlet extends HttpServlet {
 		logger.debug("jrss servlet initialized");
 	}
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		logger.info("Servlet received GET call");
 		doGetOrPost(request, response);
 	}
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	    
 		logger.info("Servlet received POST call");
 		doGetOrPost(request, response);
 	}
 
-	private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+	private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		JrssResponse jrssResponse = null;
 		
-		String opUrl = request.getRequestURI().substring(request.getContextPath().length()+1).trim();
-		EnumOperations op = urlOperationMap.get(opUrl);
-		if(op==null) {
-			logger.warn("Unkown stack operation '" + opUrl + "', returning error");
-			jrssResponse = new JrssResponse(EnumOperationStatus.ERROR, 
-					null, null, StackException.EnumErrorCodes.E01);
+		try {			
+			response.setContentType("application/json");
+			JrssResponse jrssResponse = null;
+			
+			String opUrl = request.getRequestURI().substring(request.getContextPath().length()+1).trim();
+			EnumOperations op = urlOperationMap.get(opUrl);
+			if(op==null) {
+				logger.warn("Unkown stack operation '" + opUrl + "', returning error");
+				jrssResponse = new JrssResponse(EnumOperationStatus.ERROR, 
+						null, null, StackException.EnumErrorCodes.E01);
+			}
+			else {			
+				String stackid = URLEncoder.encode(request.getParameter("stackid"), "UTF-8");
+				String data = request.getParameter("data");
+				if(data!=null)
+					data = URLEncoder.encode(data, "UTF-8");
+				jrssResponse = stackOperation(op, stackid, data);
+			}
+			
+			out.print(jrssResponse.toJson());
 		}
-		else {			
-			String stackid = URLEncoder.encode(request.getParameter("stackid"), "UTF-8");
-			String data = request.getParameter("data");
-			if(data!=null)
-				data = URLEncoder.encode(data, "UTF-8");
-			jrssResponse = stackOperation(op, stackid, data);
+		catch(Exception e) {
+			JrssResponse jrssResponse = new JrssResponse(EnumOperationStatus.ERROR, null, null, EnumErrorCodes.E09);
+			out.print(jrssResponse.toJson());
 		}
-		
-		out.print(jrssResponse.toJson());
 	}
 	
 	private JrssResponse stackOperation(EnumOperations operation, String stackid, String data) {
