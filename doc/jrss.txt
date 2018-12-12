@@ -1,0 +1,96 @@
+--------------------------------------------------------------------------------
+  JRSS - JSON Raw Storage Stack
+
+  API manual
+
+  github.com/a-zz, 2018
+--------------------------------------------------------------------------------
+
+..:: Introduction ::..
+JRSS is an online repository for JSON data, enabling distributed applications to 
+exchange information via HTTP in an extremely quick & dirty fashion.
+
+JRSS simply stores text data chunks referred by an id. Storage is run in a  
+stacked fashion: older values for a certain id are kept unless explicitly 
+removed, so JRSS may be used for instant or historic values, log storage and 
+-well- a proper stack functionality.
+
+..:: Production API ::..
+So far, production API implements four basic stack operations: 
+
+* Push data into a stack. The stack is created if it doesn't exist.
+* Pop data from a stack (return the last data and delete it).
+* Get data from a stack (return the last data, but keeping it).
+* Reset a stack (destroy data and the stack itself).
+
+These operations are invoked as HTTP GET/POST calls to the deployment server:
+
+  * Push : http://your.server/your.context/psh
+  * Pop  : http...     "            "     /pop
+  * Get  : http...     "            "     /get
+  * Reset: http...     "            "     /rst
+
+Each call receives one or two arguments that can be submitted in the URL string 
+(for GET calls) or as form data (for POST), being the later the preferred 
+method, as well as the only available for large data sets. 
+
+  * All operations must be supplied with an argument named "stackid": the id. of 
+  	the stack to operate with. It's a non-null string up to 1024 chars.
+
+  * The push operation must addtionally be supplied with a "data" argument 
+  	containing the actual data to be pushed into the stack. It's expected to be 
+  	a JSON formatted string, but this isn't checked nor enforced: any string 
+  	data will be accepted. The data is stored in an internal database along 
+  	with a timestamp.
+
+In any case, both arguments are to be properly encoded. Either the client and 
+the servlet are expected to handle encoding nicely, but the safe approach is to 
+explicitly encode arguments as UTF-8; they're stored internally as UTF-8 anyway. 
+Besides, null data is stored as an empty (zero-length) string. 
+
+Regardless the actual data submitted, the return type is always a UTF-8-encoded
+JSON object with three fields:
+
+  * "status": either "OK" or "ER".
+  
+  * "ts": the operation timestamp as a long (millis from epoch). It's the stored 
+  	data timestamp in pop/get operations; the current time otherwise.
+  	
+  * "data": in the event of succesful pop/get operation, it's the last data 
+  	stored in the stack. If in error (status=="ER"), it's "ER" plus a two-
+  	digit error code (see below) plus a human readable description of the error. 
+  	Empty string otherwise.
+  	
+Possible error codes returned by JRSS are:
+
+  * ER0x - General errors ----------------------------------------------------
+  * ER00 - No error (for completeness only, this will never be reported).
+  * ER01 - Unsupported operation: JRSS was asked for an unkown operation.
+  * ER09 - Unknown error
+  * ER1x - Data integrity errors ---------------------------------------------
+  * ER11 - Bad stackid: probably null, or zero-lenght or above 1024 chars.
+  * ER12 - Stack does not exist: tried to pop/get/reset a non-existent stack.
+  * ER13 - Stack is empty: tried to pop/get data from an empty stack.
+  * ER3x - DB related errors -------------------------------------------------
+  * ER31 - DB is unavailable (i.e. couldn't connect)
+  * ER32 - DB read error 
+  * ER33 - DB write error
+  * ER39 - Unknown DB error
+
+..:: Metadata API ::..
+(to be implemented)
+
+..:: Security ::..
+The security scheme for JRSS is called _No Object Needs Encryption_. 
+
+That is: NONE. This came as a joke in the early phases of design and has stuck,
+maybe forever.
+
+Security, when needed (when not?) is left to other layers such as TCP-IP (IPsec, 
+firewalling), SSL (HTTPS with mutual authentication) or even consumer-
+application-defined security (stackids and data encrypted prior to submission).
+
+We're aware this can be a pain for large deployments, so a builtin client 
+authentication mechanism may be implemented in the future. Data encryption will 
+likely be not, anyway.
+--------------------------------------------------------------------------------
