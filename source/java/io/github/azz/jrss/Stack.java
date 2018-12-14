@@ -5,6 +5,8 @@
 
 package io.github.azz.jrss;
 
+import java.net.URLEncoder;
+
 import io.github.azz.jrss.StackException.EnumErrorCodes;
 import io.github.azz.jrss.da.StackDaInterface;
 import io.github.azz.logging.AppLogger;
@@ -39,13 +41,18 @@ public class Stack {
 	 * @throws StackException
 	 */
 	public Stack(String stackid) throws StackException {
-	
+
 		if(stackid==null ||
 				stackid.length()==0 ||
 				stackid.length()>2014)
 			throw new StackException(EnumErrorCodes.E11);
 		
-		this.stackid = stackid;
+		try {
+			this.stackid = URLEncoder.encode(stackid, "UTF-8");
+		}
+		catch(Exception e) {
+			throw new StackException(EnumErrorCodes.E09);
+		}
 	}
 	
 	/**

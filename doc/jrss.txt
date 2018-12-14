@@ -65,7 +65,8 @@ Possible error codes returned by JRSS are:
 
   * ER0x - General errors ----------------------------------------------------
   * ER00 - No error (for completeness only, this will never be reported).
-  * ER01 - Unsupported operation: JRSS was asked for an unkown operation.
+  * ER01 - No operation specified in the URL
+  * ER02 - Unsupported operation: JRSS was asked for an unkown operation.
   * ER09 - Unknown error
   * ER1x - Data integrity errors ---------------------------------------------
   * ER11 - Bad stackid: probably null, or zero-lenght or above 1024 chars.

@@ -13,7 +13,8 @@ public class StackException extends Exception {
 	 * Error codes:<br/><ul>
 	 * 	<strong>General errors:</strong><br/>
 	 * 	<li>E00: No error (useless, won't ever be reported)</li>
-	 * 	<li>E01: Unsupported operation</li>
+	 * 	<li>E01: No operation</li>
+	 * 	<li>E02: Unsupported operation</li>
 	 * 	<li>E09: Unknown error</li>
 	 * 	<strong>Data integrity errors:</strong><br/>
 	 * 	<li>E11: Bad stackid (posibly null, zero-length or length above 1024 chars)</li>
@@ -30,8 +31,10 @@ public class StackException extends Exception {
 		// E0x: General errors
 		/** E00: No error (useless, won't ever be reported) */
 		E00,
-		/** E01: Unsupported operation */
-		E01, 
+		/** E01: No operation */
+		E01,
+		/** E02: Unsupported operation */
+		E02, 
 		/** E09: Unkown error */
 		E09,
 		// E1x: Data integrity errors
