@@ -69,7 +69,7 @@ Possible error codes returned by JRSS are:
   * ER02 - Unsupported operation: JRSS was asked for an unkown operation.
   * ER09 - Unknown error
   * ER1x - Data integrity errors ---------------------------------------------
-  * ER11 - Bad stackid: probably null, or zero-lenght or above 1024 chars.
+  * ER11 - Bad stackid: probably null, or zero-length or above 1024 chars.
   * ER12 - Stack does not exist: tried to pop/get/reset a non-existent stack.
   * ER13 - Stack is empty: tried to pop/get data from an empty stack.
   * ER3x - DB related errors -------------------------------------------------
